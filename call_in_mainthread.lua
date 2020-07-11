@@ -1,9 +1,10 @@
 -- Helper module for changing call context from a coroutine to the main thread
 
 local mainthread_stash = {}
-local yield = (package.loaded["copas"] and package.loaded["copas"].sleep) or coroutine.yield
+local yield
 
 local function mainthread_call(f, ...)
+  yield = yield or (package.loaded["copas"] and package.loaded["copas"].sleep) or coroutine.yield
   local thread = coroutine.running()
   assert(thread, "cannot call from the main thread")
   mainthread_stash[thread] = mainthread_stash[thread] or {}

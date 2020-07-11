@@ -1,5 +1,5 @@
-local copas = require 'copas'
 local cim = require 'call_in_mainthread'
+local copas = require 'copas'
 
 describe("This module used in #copas loop", function()
   it("can execute a function",
