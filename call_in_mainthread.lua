@@ -1,6 +1,7 @@
 -- Helper module for changing call context from a coroutine to the main thread
 
 local mainthread_stash = {}
+local yield = (package.loaded["copas"] and package.loaded["copas"].sleep) or coroutine.yield
 
 local function mainthread_call(f, ...)
   local thread = coroutine.running()
@@ -10,7 +11,7 @@ local function mainthread_call(f, ...)
   mainthread_stash[thread].f = f
   mainthread_stash[thread].args = {...}
   while mainthread_stash[thread].status == nil do
-    coroutine.yield()
+    yield()
   end
   return mainthread_stash[thread].status, mainthread_stash[thread].res
 end

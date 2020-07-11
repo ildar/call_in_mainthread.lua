@@ -1,9 +1,9 @@
+local copas = require 'copas'
 local cim = require 'call_in_mainthread'
 
-describe("This module", function()
+describe("This module used in #copas loop", function()
   it("can execute a function",
     function()
-      local status, info
       local costatus = true
       local tab = {}
       local function f()
@@ -11,11 +11,15 @@ describe("This module", function()
           costatus = costatus and cim.mainthread_call(table.insert, tab, i)
         end
       end
-      local co = coroutine.create(f)
-      repeat
-        status, info = coroutine.resume(co)
+      copas.addthread(f)
+      -- copas.loop() midified
+      copas.running = true
+      while not copas.finished() do
+        copas.step()
         cim.mainthread_process()
-      until not status
+      end
+      copas.running = false
+      
       assert.is_equal( true, costatus )
       assert.is_equal( "123", table.concat(tab) )
     end)
@@ -26,11 +30,15 @@ describe("This module", function()
       local function f()
         costatus, res = cim.mainthread_call(error, "error msg")
       end
-      local co = coroutine.create(f)
-      repeat
-        status, info = coroutine.resume(co)
+      copas.addthread(f)
+      -- copas.loop() midified
+      copas.running = true
+      while not copas.finished() do
+        copas.step()
         cim.mainthread_process()
-      until not status
+      end
+      copas.running = false
+      
       assert.is_equal( false, costatus )
       assert.is_equal( "error msg", res )
     end)
