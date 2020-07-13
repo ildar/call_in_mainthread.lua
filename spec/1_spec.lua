@@ -35,5 +35,19 @@ describe("This module", function()
       assert.is_equal( "error msg", res )
     end)
 
+  it("can execute a function in the main thread",
+    function()
+      local costatus = true
+      local tab = {}
+      local function f()
+        for i=1,3 do
+          costatus = costatus and cim.mainthread_call(table.insert, tab, i)
+        end
+      end
+      f() -- in main thread
+      assert.is_equal( true, costatus )
+      assert.is_equal( "123", table.concat(tab) )
+    end)
+
 end)
   

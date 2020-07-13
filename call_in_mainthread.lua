@@ -6,7 +6,9 @@ local yield
 local function mainthread_call(f, ...)
   yield = yield or (package.loaded["copas"] and package.loaded["copas"].sleep) or coroutine.yield
   local thread = coroutine.running()
-  assert(thread, "cannot call from the main thread")
+  if not thread then
+    return pcall(f, ...)
+  end
   mainthread_stash[thread] = mainthread_stash[thread] or {}
   mainthread_stash[thread].status = nil
   mainthread_stash[thread].f = f
