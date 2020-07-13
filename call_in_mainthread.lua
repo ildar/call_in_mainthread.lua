@@ -5,8 +5,8 @@ local yield
 
 local function mainthread_call(f, ...)
   yield = yield or (package.loaded["copas"] and package.loaded["copas"].sleep) or coroutine.yield
-  local thread = coroutine.running()
-  if not thread then
+  local thread, main = coroutine.running()
+  if main or thread == nil then
     return pcall(f, ...)
   end
   mainthread_stash[thread] = mainthread_stash[thread] or {}
